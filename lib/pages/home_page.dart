@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
                                     color: Colors.white, fontSize: 12
                                 ),
                               ),
-                              const SizedBox(height: 10,),
+                              const SizedBox(height: 5,),
                               Text(
                                   "Rp. 3.000,00",
                                 style: GoogleFonts.montserrat(
@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                                     color: Colors.white, fontSize: 12
                                 ),
                               ),
-                              const SizedBox(height: 10,),
+                              const SizedBox(height: 5,),
                               Text(
                                   "Rp. 3.000,00",
                                 style: GoogleFonts.montserrat(
