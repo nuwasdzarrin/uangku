@@ -3,6 +3,7 @@ import 'package:calendar_appbar/calendar_appbar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uangku/pages/category_page.dart';
 import 'package:uangku/pages/home_page.dart';
+import 'package:uangku/pages/transaction_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -49,7 +50,13 @@ class _MainPageState extends State<MainPage> {
       floatingActionButton: Visibility(
         visible: currentIndex == 0,
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const TransactionPage()
+                )
+            ).then((value) => () {});
+          },
           backgroundColor: Colors.green,
           child: const Icon(Icons.add),
         ),
