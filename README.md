@@ -1,6 +1,7 @@
 # uangku
 
-A new Flutter project.
+A new Flutter project to manage money. Build with flutter and local DB.
+tutorial can find in here: https://www.youtube.com/playlist?list=PLXTfmstF10qCoJ9GBE0iZt4pRP_nE4K56
 
 ## Getting Started
 
