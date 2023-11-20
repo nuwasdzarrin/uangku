@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class TransactionPage extends StatefulWidget {
   const TransactionPage({super.key});
@@ -12,6 +13,7 @@ class _TransactionPageState extends State<TransactionPage> {
   bool isExpense = true;
   List<String> list = ["Makan dan Jajan", "Transportasi", "Nonton Film"];
   late String dropDownValue = list.first;
+  TextEditingController dateController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,6 +80,37 @@ class _TransactionPageState extends State<TransactionPage> {
                     );
                   }).toList(),
                   onChanged: ((String? value) {}),
+                ),
+              ),
+              const SizedBox(height: 25,),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, ),
+                child: TextField(
+                  readOnly: true,
+                  controller: dateController,
+                  decoration: const InputDecoration(
+                      labelText: "Enter Date",
+                  ),
+                  onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2099)
+                    );
+                    if (pickedDate != null) {
+                      String formattedDate =
+                        DateFormat('yyyy-MM-dd').format(pickedDate);
+                      dateController.text = formattedDate;
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 25,),
+              Center(
+                child: ElevatedButton(
+                    onPressed: () {},
+                    child: const Text("Save")
                 ),
               )
             ],
