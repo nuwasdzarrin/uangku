@@ -25,7 +25,6 @@ class _CategoryPageState extends State<CategoryPage> {
             updatedAt: now
         )
     );
-    print("Masuk: " + result.toString());
   }
 
   Future<List<Category>> getAllCategory(int type) async {

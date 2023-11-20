@@ -11,9 +11,15 @@ class TransactionPage extends StatefulWidget {
 
 class _TransactionPageState extends State<TransactionPage> {
   bool isExpense = true;
-  List<String> list = ["Makan dan Jajan", "Transportasi", "Nonton Film"];
-  late String dropDownValue = list.first;
+  List<String> categoryOptions = ["Makan dan Jajan", "Transportasi", "Nonton Film"];
+  late String categorySelected = categoryOptions.first;
   TextEditingController dateController = TextEditingController();
+  TextEditingController amountController = TextEditingController();
+  TextEditingController noteController = TextEditingController();
+
+  Future? insert (int amount, String date, String category) {
+    return null;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +31,7 @@ class _TransactionPageState extends State<TransactionPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16,),
+              const SizedBox(height: 25,),
               Row(
                 children: [
                   Switch(
@@ -47,10 +53,11 @@ class _TransactionPageState extends State<TransactionPage> {
                   )
                 ]
               ),
-              const SizedBox(height: 16,),
+              const SizedBox(height: 25,),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16,),
                 child: TextFormField(
+                  controller: amountController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     border: UnderlineInputBorder(),
@@ -72,9 +79,9 @@ class _TransactionPageState extends State<TransactionPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16,),
                 child: DropdownButton<String>(
                   isExpanded: true,
-                  value: dropDownValue,
+                  value: categorySelected,
                   icon: const Icon(Icons.arrow_downward),
-                  items: list.map<DropdownMenuItem<String>>((String value) {
+                  items: categoryOptions.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                         value: value, child: Text(value)
                     );
@@ -85,7 +92,7 @@ class _TransactionPageState extends State<TransactionPage> {
               const SizedBox(height: 25,),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, ),
-                child: TextField(
+                child: TextFormField(
                   readOnly: true,
                   controller: dateController,
                   decoration: const InputDecoration(
@@ -105,6 +112,17 @@ class _TransactionPageState extends State<TransactionPage> {
                     }
                   },
                 ),
+              ),
+              const SizedBox(height: 25,),
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16,),
+                  child: TextFormField(
+                    controller: noteController,
+                    decoration: const InputDecoration(
+                        border: UnderlineInputBorder(),
+                        labelText: "Note"
+                    ),
+                  )
               ),
               const SizedBox(height: 25,),
               Center(

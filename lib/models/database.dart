@@ -20,7 +20,6 @@ class AppDatabase extends _$AppDatabase {
   int get schemaVersion => 1;
 
   // CRUD Category
-
   Future<List<Category>> getAllCategoryRepo(int type) async {
     return await (select(categories)..where(
             (tbl) => tbl.type.equals(type)
@@ -33,6 +32,11 @@ class AppDatabase extends _$AppDatabase {
   }
   Future deleteCategoryRepo(int id) async {
     return (delete(categories)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  // CRUD Transaction
+  Future<List<MoneyTransactionData>> getAllMoneyTransactionRepo(int type) async {
+    return await (select(moneyTransaction)).get();
   }
 }
 
