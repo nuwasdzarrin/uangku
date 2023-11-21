@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:calendar_appbar/calendar_appbar.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:uangku/pages/category_page.dart';
 import 'package:uangku/pages/home_page.dart';
 import 'package:uangku/pages/transaction_page.dart';
@@ -13,12 +14,30 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  final List<Widget> _children = [const HomePage(), const CategoryPage()];
+  List<Widget>? _children;
   int currentIndex = 0;
+  late DateTime selectedDate;
+
+  @override
+  void initState() {
+    updateView(0, DateTime.now());
+    super.initState();
+  }
 
   void onTapTapped(int index) {
     setState(() {
       currentIndex = index;
+    });
+  }
+
+  void updateView(int index, DateTime? date) {
+    setState(() {
+      if (date != null) {
+        selectedDate = DateTime.parse(DateFormat('yyyy-MM-dd').format(date));
+      }
+
+      currentIndex = index;
+      _children = [HomePage(selectedDate: selectedDate), const CategoryPage()];
     });
   }
   @override
@@ -33,15 +52,13 @@ class _MainPageState extends State<MainPage> {
         lastDate: DateTime.now(),
       ) : PreferredSize(
           preferredSize: const Size.fromHeight(100),
-          child: Container(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 36),
-              child: Text(
-                "Category",
-                style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold
-                ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 36),
+            child: Text(
+              "Category",
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: FontWeight.bold
               ),
             ),
           )

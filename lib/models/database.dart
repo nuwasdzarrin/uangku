@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:uangku/models/category.dart';
 import 'package:uangku/models/money_transaction.dart';
+import 'package:uangku/models/transaction_with_category.dart';
 
 part 'database.g.dart';
 
@@ -35,8 +36,22 @@ class AppDatabase extends _$AppDatabase {
   }
 
   // CRUD Transaction
-  Future<List<MoneyTransactionData>> getAllMoneyTransactionRepo(int type) async {
-    return await (select(moneyTransaction)).get();
+  Stream<List<TransactionWithCategory>> getTransactionByDate(DateTime date) {
+    final query = (select(moneyTransaction).join(
+        [
+          innerJoin(
+              categories, categories.id.equalsExp(moneyTransaction.categoryId)
+          )
+        ]
+    )..where(moneyTransaction.transactionDate.equals(date)));
+
+    return query.watch().map((rows) {
+      return rows.map((row) {
+        return TransactionWithCategory(
+            row.readTable(moneyTransaction), row.readTable(categories)
+        );
+      }).toList();
+    });
   }
 }
 
