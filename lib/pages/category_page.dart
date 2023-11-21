@@ -122,7 +122,7 @@ class _CategoryPageState extends State<CategoryPage> {
                         child: CircularProgressIndicator(),
                       );
                     } else {
-                      if (snapshot.hasData && snapshot.data!.length > 0) {
+                      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                         return ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),

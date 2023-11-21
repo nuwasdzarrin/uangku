@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:uangku/models/database.dart';
 
 class TransactionPage extends StatefulWidget {
   const TransactionPage({super.key});
@@ -11,15 +12,36 @@ class TransactionPage extends StatefulWidget {
 
 class _TransactionPageState extends State<TransactionPage> {
   bool isExpense = true;
-  List<String> categoryOptions = ["Makan dan Jajan", "Transportasi", "Nonton Film"];
-  late String categorySelected = categoryOptions.first;
+  Category? categorySelected;
   TextEditingController dateController = TextEditingController();
   TextEditingController amountController = TextEditingController();
   TextEditingController noteController = TextEditingController();
 
-  Future? insert (int amount, String date, String category) {
-    return null;
+  final AppDatabase database = AppDatabase();
+  Future<List<Category>> getAllCategory(int type) async {
+    return await database.getAllCategoryRepo(type);
   }
+  Future insert () async {
+    DateTime now = DateTime.now();
+    final result = await database.into(database.moneyTransaction).insertReturning(
+        MoneyTransactionCompanion.insert(
+            categoryId: categorySelected!.id,
+            name: noteController.text,
+            amount: int.parse(amountController.text),
+            transactionDate: DateTime.parse(dateController.text),
+            createdAt: now,
+            updatedAt: now
+        )
+    );
+    print('hasil: ' + result.toString());
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +62,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       setState(() {
                         isExpense = value;
                       });
+                      categorySelected = null;
                     },
                     inactiveTrackColor: Colors.green[200],
                     inactiveThumbColor: Colors.green,
@@ -75,19 +98,42 @@ class _TransactionPageState extends State<TransactionPage> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16,),
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  value: categorySelected,
-                  icon: const Icon(Icons.arrow_downward),
-                  items: categoryOptions.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                        value: value, child: Text(value)
-                    );
-                  }).toList(),
-                  onChanged: ((String? value) {}),
-                ),
+              FutureBuilder<List<Category>>(
+                  future: getAllCategory(isExpense ? 2 : 1),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else {
+                      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                        // categorySelected = snapshot.data!.first;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16,),
+                          child: DropdownButton<Category>(
+                            isExpanded: true,
+                            value: categorySelected ?? snapshot.data!.first,
+                            icon: const Icon(Icons.arrow_downward),
+                            items: snapshot.data!.map((Category item) {
+                              return DropdownMenuItem<Category>(
+                                value: item,
+                                child: Text(item.name),
+                              );
+                            }).toList(),
+                            onChanged: ((Category? value) {
+                              setState(() {
+                                categorySelected = value;
+                              });
+                            }),
+                          ),
+                        );
+                      } else {
+                        return const Center(
+                          child: Text("Category not found"),
+                        );
+                      }
+                    }
+                  }
               ),
               const SizedBox(height: 25,),
               Padding(
@@ -127,7 +173,14 @@ class _TransactionPageState extends State<TransactionPage> {
               const SizedBox(height: 25,),
               Center(
                 child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      insert();
+                      // amountController.clear();
+                      // noteController.clear();
+                      // dateController.clear();
+                      // categorySelected = null;
+                      Navigator.pop(context, true);
+                    },
                     child: const Text("Save")
                 ),
               )
