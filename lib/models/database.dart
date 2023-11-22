@@ -36,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   // CRUD Transaction
-  Stream<List<TransactionWithCategory>> getTransactionByDate(DateTime date) {
+  Stream<List<TransactionWithCategory>> getTransactionByDateRepo(DateTime date) {
     final query = (select(moneyTransaction).join(
         [
           innerJoin(

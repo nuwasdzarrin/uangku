@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:uangku/helpers/formatter.dart';
+import 'package:uangku/models/database.dart';
+import 'package:uangku/models/transaction_with_category.dart';
+import 'package:uangku/pages/transaction_page.dart';
 
 class HomePage extends StatefulWidget {
   final DateTime selectedDate;
@@ -10,6 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final AppDatabase database = AppDatabase();
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -110,62 +115,77 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Card(
-                  elevation: 10,
-                  child: ListTile(
-                    trailing: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.delete),
-                        SizedBox(width: 10,),
-                        Icon(Icons.edit),
-                      ],
-                    ),
-                    title: const Text("Rp 20.000"),
-                    subtitle: const Text("Makan siang"),
-                    leading: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8)
-                      ),
-                      child: const Icon(
-                        Icons.download,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ),
-                ),
+              StreamBuilder<List<TransactionWithCategory>>(
+                  stream: database.getTransactionByDateRepo(widget.selectedDate),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else {
+                      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                        return ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            Formatter formatter = Formatter();
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Card(
+                                elevation: 10,
+                                child: ListTile(
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.delete),
+                                      const SizedBox(width: 10,),
+                                      IconButton(
+                                        icon: const Icon(Icons.edit),
+                                        onPressed: (){
+                                          Navigator.of(context).push(MaterialPageRoute(
+                                              builder: (context) => TransactionPage(
+                                                  transactionWithCategory: snapshot.data![index]
+                                              )
+                                          ));
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  title: Text(
+                                      "Rp. ${formatter.formatNumber(
+                                          snapshot.data![index].transaction.amount
+                                      )}"
+                                  ),
+                                  subtitle: Text(
+                                      snapshot.data![index].transaction.name
+                                  ),
+                                  leading: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8)
+                                    ),
+                                    child: snapshot.data![index].category.type == 1 ? const Icon(
+                                      Icons.download,
+                                      color: Colors.green,
+                                    ) : const Icon(
+                                      Icons.upload,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        );
+                      } else {
+                        return const Center(
+                          child: Text("Data not found"),
+                        );
+                      }
+                    }
+                  }
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Card(
-                  elevation: 10,
-                  child: ListTile(
-                    trailing: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.delete),
-                        SizedBox(width: 10,),
-                        Icon(Icons.edit),
-                      ],
-                    ),
-                    title: const Text("Rp 20.000"),
-                    subtitle: const Text("Makan siang"),
-                    leading: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8)
-                      ),
-                      child: const Icon(
-                        Icons.upload,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-                ),
-              )
             ],
           )
       ),

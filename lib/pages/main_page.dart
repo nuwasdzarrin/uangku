@@ -14,9 +14,9 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  List<Widget>? _children;
-  int currentIndex = 0;
   late DateTime selectedDate;
+  late List<Widget> _children;
+  late int currentIndex = 0;
 
   @override
   void initState() {
@@ -24,18 +24,11 @@ class _MainPageState extends State<MainPage> {
     super.initState();
   }
 
-  void onTapTapped(int index) {
-    setState(() {
-      currentIndex = index;
-    });
-  }
-
   void updateView(int index, DateTime? date) {
     setState(() {
       if (date != null) {
         selectedDate = DateTime.parse(DateFormat('yyyy-MM-dd').format(date));
       }
-
       currentIndex = index;
       _children = [HomePage(selectedDate: selectedDate), const CategoryPage()];
     });
@@ -47,7 +40,12 @@ class _MainPageState extends State<MainPage> {
         accent: Colors.green,
         backButton: false,
         locale: 'id',
-        onDateChanged: (value) => print(value),
+        onDateChanged: (value) {
+          setState(() {
+            selectedDate = value;
+            updateView(0, selectedDate);
+          });
+        },
         firstDate: DateTime.now().subtract(const Duration(days: 140)),
         lastDate: DateTime.now(),
       ) : PreferredSize(
@@ -70,9 +68,11 @@ class _MainPageState extends State<MainPage> {
           onPressed: () {
             Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const TransactionPage()
+                  builder: (context) => const TransactionPage(
+                    transactionWithCategory: null,
+                  )
                 )
-            ).then((value) => () {});
+            ).then((value) {});
           },
           backgroundColor: Colors.green,
           child: const Icon(Icons.add),
@@ -85,14 +85,14 @@ class _MainPageState extends State<MainPage> {
           children: [
             IconButton(
                 onPressed: () {
-                  onTapTapped(0);
+                  updateView(0, DateTime.now());
                 },
                 icon: const Icon(Icons.home)
             ),
             const SizedBox(width: 20),
             IconButton(
                 onPressed: () {
-                  onTapTapped(1);
+                  updateView(1, null);
                 },
                 icon: const Icon(Icons.list)
             ),

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:uangku/models/database.dart';
+import 'package:uangku/models/transaction_with_category.dart';
 
 class TransactionPage extends StatefulWidget {
-  const TransactionPage({super.key});
+  final TransactionWithCategory? transactionWithCategory;
+  const TransactionPage({super.key, required this.transactionWithCategory});
 
   @override
   State<TransactionPage> createState() => _TransactionPageState();
@@ -33,13 +35,22 @@ class _TransactionPageState extends State<TransactionPage> {
             updatedAt: now
         )
     );
-    print('hasil: ' + result.toString());
   }
 
   @override
   void initState() {
     // TODO: implement initState
+    if (widget.transactionWithCategory != null) {
+      updateTransaction(widget.transactionWithCategory);
+    }
     super.initState();
+  }
+
+  void updateTransaction(TransactionWithCategory? transactionWithCategory) {
+    amountController.text = transactionWithCategory!.transaction.amount.toString();
+    noteController.text = transactionWithCategory.transaction.name.toString();
+    dateController.text = DateFormat("yyyy-MM-dd").format(transactionWithCategory.transaction.transactionDate);
+    isExpense = transactionWithCategory.category.type as bool;
   }
 
   @override
@@ -107,7 +118,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       );
                     } else {
                       if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                        // categorySelected = snapshot.data!.first;
+                        categorySelected = categorySelected ?? snapshot.data!.first;
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16,),
                           child: DropdownButton<Category>(
@@ -175,10 +186,6 @@ class _TransactionPageState extends State<TransactionPage> {
                 child: ElevatedButton(
                     onPressed: () {
                       insert();
-                      // amountController.clear();
-                      // noteController.clear();
-                      // dateController.clear();
-                      // categorySelected = null;
                       Navigator.pop(context, true);
                     },
                     child: const Text("Save")

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uangku/models/database.dart';
@@ -17,7 +16,7 @@ class _CategoryPageState extends State<CategoryPage> {
   final AppDatabase database = AppDatabase();
   Future insert(String name, int type) async {
     DateTime now = DateTime.now();
-    final result = await database.into(database.categories).insertReturning(
+    await database.into(database.categories).insertReturning(
         CategoriesCompanion.insert(
             name: name,
             type: type,
