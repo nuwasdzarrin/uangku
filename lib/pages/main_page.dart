@@ -46,6 +46,7 @@ class _MainPageState extends State<MainPage> {
             updateView(0, selectedDate);
           });
         },
+        selectedDate: selectedDate,
         firstDate: DateTime.now().subtract(const Duration(days: 140)),
         lastDate: DateTime.now(),
       ) : PreferredSize(
@@ -72,7 +73,14 @@ class _MainPageState extends State<MainPage> {
                     transactionWithCategory: null,
                   )
                 )
-            ).then((value) {});
+            ).then((value) {
+              if (value != null) {
+                setState(() {
+                  selectedDate = DateTime.parse(value);
+                  updateView(0, selectedDate);
+                });
+              }
+            });
           },
           backgroundColor: Colors.green,
           child: const Icon(Icons.add),

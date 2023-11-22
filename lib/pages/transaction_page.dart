@@ -200,7 +200,7 @@ class _TransactionPageState extends State<TransactionPage> {
                     onPressed: () {
                       widget.transactionWithCategory == null ? insert()
                           : update(widget.transactionWithCategory!.transaction.id);
-                      Navigator.pop(context, true);
+                      Navigator.pop(context, dateController.text);
                     },
                     child: const Text("Save")
                 ),
