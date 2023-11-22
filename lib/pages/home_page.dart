@@ -138,7 +138,13 @@ class _HomePageState extends State<HomePage> {
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.delete),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        onPressed: () async {
+                                          await database.deleteTransactionRepo(snapshot.data![index].transaction.id);
+                                          setState(() {});
+                                        },
+                                      ),
                                       const SizedBox(width: 10,),
                                       IconButton(
                                         icon: const Icon(Icons.edit),
@@ -157,8 +163,24 @@ class _HomePageState extends State<HomePage> {
                                           snapshot.data![index].transaction.amount
                                       )}"
                                   ),
-                                  subtitle: Text(
-                                      snapshot.data![index].transaction.name
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 10,),
+                                      Text(
+                                        snapshot.data![index].transaction.name,
+                                        style: GoogleFonts.montserrat(
+                                          fontWeight: FontWeight.w500
+                                        )
+                                      ),
+                                      const SizedBox(height: 5,),
+                                      Text(
+                                        snapshot.data![index].category.name,
+                                        style: GoogleFonts.montserrat(
+                                            color: snapshot.data![index].category.type == 2 ? Colors.red : Colors.green
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   leading: Container(
                                     decoration: BoxDecoration(

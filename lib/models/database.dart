@@ -26,7 +26,7 @@ class AppDatabase extends _$AppDatabase {
             (tbl) => tbl.type.equals(type)
     )).get();
   }
-  Future updateCategoryRepo(int id, String name) {
+  Future updateCategoryRepo(int id, String name) async {
     return (update(categories)..where(
             (tbl) => tbl.id.equals(id))
     ).write(CategoriesCompanion(name: Value(name)));
@@ -52,6 +52,20 @@ class AppDatabase extends _$AppDatabase {
         );
       }).toList();
     });
+  }
+  Future updateTransactionRepo(int id, int amount, int categoryId,
+      DateTime transactionDate, String name) async {
+    return (update(moneyTransaction)..where(
+            (tbl) => tbl.id.equals(id))
+    ).write(MoneyTransactionCompanion(
+        amount: Value(amount),
+        categoryId: Value(categoryId),
+        transactionDate: Value(transactionDate),
+        name: Value(name),
+    ));
+  }
+  Future deleteTransactionRepo(int id) async {
+    return (delete(moneyTransaction)..where((tbl) => tbl.id.equals(id))).go();
   }
 }
 

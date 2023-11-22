@@ -25,7 +25,7 @@ class _TransactionPageState extends State<TransactionPage> {
   }
   Future insert () async {
     DateTime now = DateTime.now();
-    final result = await database.into(database.moneyTransaction).insertReturning(
+    await database.into(database.moneyTransaction).insertReturning(
         MoneyTransactionCompanion.insert(
             categoryId: categorySelected!.id,
             name: noteController.text,
@@ -34,6 +34,16 @@ class _TransactionPageState extends State<TransactionPage> {
             createdAt: now,
             updatedAt: now
         )
+    );
+  }
+
+  Future update(int transactionId) async {
+    return await database.updateTransactionRepo(
+      transactionId,
+      int.parse(amountController.text),
+      categorySelected!.id,
+      DateTime.parse(dateController.text),
+      noteController.text
     );
   }
 
@@ -49,8 +59,11 @@ class _TransactionPageState extends State<TransactionPage> {
   void updateTransaction(TransactionWithCategory? transactionWithCategory) {
     amountController.text = transactionWithCategory!.transaction.amount.toString();
     noteController.text = transactionWithCategory.transaction.name.toString();
-    dateController.text = DateFormat("yyyy-MM-dd").format(transactionWithCategory.transaction.transactionDate);
-    isExpense = transactionWithCategory.category.type as bool;
+    dateController.text = DateFormat("yyyy-MM-dd").format(
+        transactionWithCategory.transaction.transactionDate
+    );
+    isExpense = transactionWithCategory.category.type == 2 ? true : false;
+    categorySelected = transactionWithCategory.category;
   }
 
   @override
@@ -185,7 +198,8 @@ class _TransactionPageState extends State<TransactionPage> {
               Center(
                 child: ElevatedButton(
                     onPressed: () {
-                      insert();
+                      widget.transactionWithCategory == null ? insert()
+                          : update(widget.transactionWithCategory!.transaction.id);
                       Navigator.pop(context, true);
                     },
                     child: const Text("Save")
