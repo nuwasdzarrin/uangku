@@ -53,6 +53,12 @@ class AppDatabase extends _$AppDatabase {
       }).toList();
     });
   }
+  Future summaryRepo(DateTime date) {
+    final query = (select(moneyTransaction)..where(
+            (tbl) => tbl.transactionDate.equals(date)
+    )).get();
+    return query;
+  }
   Future updateTransactionRepo(int id, int amount, int categoryId,
       DateTime transactionDate, String name) async {
     return (update(moneyTransaction)..where(
