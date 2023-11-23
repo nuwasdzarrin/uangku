@@ -1,5 +1,5 @@
+import 'package:calendar_agenda/calendar_agenda.dart';
 import 'package:flutter/material.dart';
-import 'package:calendar_appbar/calendar_appbar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:uangku/pages/category_page.dart';
@@ -36,20 +36,22 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: currentIndex == 0 ? CalendarAppBar(
-        accent: Colors.green,
-        backButton: false,
-        locale: 'id',
-        onDateChanged: (value) {
-          setState(() {
-            selectedDate = value;
-            updateView(0, selectedDate);
-          });
-        },
-        selectedDate: selectedDate,
-        firstDate: DateTime.now().subtract(const Duration(days: 140)),
-        lastDate: DateTime.now(),
-      ) : PreferredSize(
+      appBar: currentIndex == 0 ?
+        CalendarAgenda(
+          initialDate: selectedDate,
+          firstDate: DateTime.now().subtract(const Duration(days: 140)),
+          lastDate: DateTime.now().add(const Duration(days: 8)),
+          fullCalendarScroll: FullCalendarScroll.horizontal,
+          selectedDayPosition: SelectedDayPosition.center,
+          locale: 'id',
+          onDateSelected: (date) {
+            setState(() {
+              selectedDate = date;
+              updateView(0, selectedDate);
+            });
+          },
+        )
+        : PreferredSize(
           preferredSize: const Size.fromHeight(100),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 36),
@@ -78,8 +80,7 @@ class _MainPageState extends State<MainPage> {
                 setState(() {
                   if (value == DateFormat('yyyy-MM-dd').format(selectedDate)) {
                     final dateValue = DateTime.parse(value);
-                    final valuePlusOne = DateTime(dateValue.year, dateValue.month, dateValue.day - 1);
-                    updateView(0, valuePlusOne);
+                    updateView(0, dateValue.subtract(const Duration(days: 1)));
 
                     Future.delayed(const Duration(milliseconds: 200), () {
                       selectedDate = dateValue;
