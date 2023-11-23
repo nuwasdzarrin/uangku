@@ -76,8 +76,20 @@ class _MainPageState extends State<MainPage> {
             ).then((value) {
               if (value != null) {
                 setState(() {
-                  selectedDate = DateTime.parse(value);
-                  updateView(0, selectedDate);
+                  if (value == DateFormat('yyyy-MM-dd').format(selectedDate)) {
+                    final dateValue = DateTime.parse(value);
+                    final valuePlusOne = DateTime(dateValue.year, dateValue.month, dateValue.day - 1);
+                    updateView(0, valuePlusOne);
+
+                    Future.delayed(const Duration(milliseconds: 200), () {
+                      selectedDate = dateValue;
+                      updateView(0, selectedDate);
+                    });
+                  } else {
+                    selectedDate = DateTime.parse(value);
+                    updateView(0, selectedDate);
+                  }
+                  print("after add: $selectedDate tepe-nya: ${selectedDate.runtimeType}");
                 });
               }
             });
