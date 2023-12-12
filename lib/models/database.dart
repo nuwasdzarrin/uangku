@@ -1,5 +1,6 @@
 // These imports are necessary to open the sqlite3 database
 import 'dart:io';
+import 'dart:math';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
@@ -36,7 +37,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   // CRUD Transaction
-  Stream<List<TransactionWithCategory>> getTransactionByDateRepo(DateTime date) {
+  Stream<TransactionWithSum> getTransactionByDateRepo(DateTime date) {
     final query = (select(moneyTransaction).join(
         [
           innerJoin(
@@ -46,11 +47,22 @@ class AppDatabase extends _$AppDatabase {
     )..where(moneyTransaction.transactionDate.equals(date)));
 
     return query.watch().map((rows) {
-      return rows.map((row) {
+      var income= 0;
+      var expanse= 0;
+      var results =  rows.map((row) {
+        if (row.readTable(categories).type == 2) {
+          expanse += row.readTable(moneyTransaction).amount;
+        } else {
+          income += row.readTable(moneyTransaction).amount;
+        }
         return TransactionWithCategory(
             row.readTable(moneyTransaction), row.readTable(categories)
         );
       }).toList();
+      TransactionWithSum transactionWithSum = TransactionWithSum(
+          income: income, expanse: expanse, allTransaction: results
+      );
+      return transactionWithSum;
     });
   }
   Future summaryRepo(DateTime date) {

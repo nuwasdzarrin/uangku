@@ -15,121 +15,121 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final AppDatabase database = AppDatabase();
+  final Formatter formatter = Formatter();
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Total income and expanse
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800],
-                    borderRadius: BorderRadius.circular(16)
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: StreamBuilder<TransactionWithSum>(
+            stream: database.getTransactionByDateRepo(widget.selectedDate),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                if (snapshot.hasData && snapshot.data!.allTransaction!.isNotEmpty) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8)
-                            ),
-                            child: const Icon(
-                              Icons.download,
-                              color: Colors.green,
-                            ),
+                      // Total income and expanse
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                              color: Colors.grey[800],
+                              borderRadius: BorderRadius.circular(16)
                           ),
-                          const SizedBox(width: 15,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                "Income",
-                                style: GoogleFonts.montserrat(
-                                    color: Colors.white, fontSize: 12
-                                ),
+                              Row(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8)
+                                    ),
+                                    child: const Icon(
+                                      Icons.download,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15,),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Income",
+                                        style: GoogleFonts.montserrat(
+                                            color: Colors.white, fontSize: 12
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5,),
+                                      Text(
+                                        "Rp. ${formatter.formatNumber(snapshot.data!.income!)}",
+                                        style: GoogleFonts.montserrat(
+                                            color: Colors.white, fontSize: 14
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
                               ),
-                              const SizedBox(height: 5,),
-                              Text(
-                                  "Rp. 3.000,00",
-                                style: GoogleFonts.montserrat(
-                                    color: Colors.white, fontSize: 14
-                                ),
+                              Row(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8)
+                                    ),
+                                    child: const Icon(
+                                      Icons.upload,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15,),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Expanse",
+                                        style: GoogleFonts.montserrat(
+                                            color: Colors.white, fontSize: 12
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5,),
+                                      Text(
+                                        "Rp. ${formatter.formatNumber(snapshot.data!.expanse!)}",
+                                        style: GoogleFonts.montserrat(
+                                            color: Colors.white, fontSize: 14
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
                               )
                             ],
-                          )
-                        ],
+                          ),
+                        ),
                       ),
-                      Row(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8)
-                            ),
-                            child: const Icon(
-                              Icons.upload,
-                              color: Colors.red,
-                            ),
+                      // Text Transaction
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          "Transaction",
+                          style: GoogleFonts.montserrat(
+                              fontSize: 16, fontWeight: FontWeight.bold
                           ),
-                          const SizedBox(width: 15,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Expanse",
-                                style: GoogleFonts.montserrat(
-                                    color: Colors.white, fontSize: 12
-                                ),
-                              ),
-                              const SizedBox(height: 5,),
-                              Text(
-                                  "Rp. 3.000,00",
-                                style: GoogleFonts.montserrat(
-                                    color: Colors.white, fontSize: 14
-                                ),
-                              )
-                            ],
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              // Text Transaction
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  "Transaction",
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16, fontWeight: FontWeight.bold
-                  ),
-                ),
-              ),
-              StreamBuilder<List<TransactionWithCategory>>(
-                  stream: database.getTransactionByDateRepo(widget.selectedDate),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else {
-                      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                        return ListView.builder(
+                        ),
+                      ),
+                      ListView.builder(
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: snapshot.data!.length,
+                          itemCount: snapshot.data!.allTransaction!.length,
                           itemBuilder: (context, index) {
-                            Formatter formatter = Formatter();
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Card(
@@ -141,7 +141,7 @@ class _HomePageState extends State<HomePage> {
                                       IconButton(
                                         icon: const Icon(Icons.delete),
                                         onPressed: () async {
-                                          await database.deleteTransactionRepo(snapshot.data![index].transaction.id);
+                                          await database.deleteTransactionRepo(snapshot.data!.allTransaction![index].transaction.id);
                                           setState(() {});
                                         },
                                       ),
@@ -151,7 +151,7 @@ class _HomePageState extends State<HomePage> {
                                         onPressed: (){
                                           Navigator.of(context).push(MaterialPageRoute(
                                               builder: (context) => TransactionPage(
-                                                  transactionWithCategory: snapshot.data![index]
+                                                  transactionWithCategory: snapshot.data!.allTransaction![index]
                                               )
                                           ));
                                         },
@@ -160,7 +160,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   title: Text(
                                       "Rp. ${formatter.formatNumber(
-                                          snapshot.data![index].transaction.amount
+                                          snapshot.data!.allTransaction![index].transaction.amount
                                       )}"
                                   ),
                                   subtitle: Column(
@@ -168,16 +168,16 @@ class _HomePageState extends State<HomePage> {
                                     children: [
                                       const SizedBox(height: 10,),
                                       Text(
-                                        snapshot.data![index].transaction.name,
-                                        style: GoogleFonts.montserrat(
-                                          fontWeight: FontWeight.w500
-                                        )
+                                          snapshot.data!.allTransaction![index].transaction.name,
+                                          style: GoogleFonts.montserrat(
+                                              fontWeight: FontWeight.w500
+                                          )
                                       ),
                                       const SizedBox(height: 5,),
                                       Text(
-                                        snapshot.data![index].category.name,
+                                        snapshot.data!.allTransaction![index].category.name,
                                         style: GoogleFonts.montserrat(
-                                            color: snapshot.data![index].category.type == 2 ? Colors.red : Colors.green
+                                            color: snapshot.data!.allTransaction![index].category.type == 2 ? Colors.red : Colors.green
                                         ),
                                       ),
                                     ],
@@ -187,7 +187,7 @@ class _HomePageState extends State<HomePage> {
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(8)
                                     ),
-                                    child: snapshot.data![index].category.type == 1 ? const Icon(
+                                    child: snapshot.data!.allTransaction![index].category.type == 1 ? const Icon(
                                       Icons.download,
                                       color: Colors.green,
                                     ) : const Icon(
@@ -199,17 +199,115 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           }
-                        );
-                      } else {
-                        return const Center(
-                          child: Text("Data not found"),
-                        );
-                      }
-                    }
-                  }
-              ),
-            ],
-          )
+                      )
+                    ],
+                  );
+                } else {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                              color: Colors.grey[800],
+                              borderRadius: BorderRadius.circular(16)
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8)
+                                    ),
+                                    child: const Icon(
+                                      Icons.download,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15,),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Income",
+                                        style: GoogleFonts.montserrat(
+                                            color: Colors.white, fontSize: 12
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5,),
+                                      Text(
+                                        "Rp. ${formatter.formatNumber(0)}",
+                                        style: GoogleFonts.montserrat(
+                                            color: Colors.white, fontSize: 14
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8)
+                                    ),
+                                    child: const Icon(
+                                      Icons.upload,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15,),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Expanse",
+                                        style: GoogleFonts.montserrat(
+                                            color: Colors.white, fontSize: 12
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5,),
+                                      Text(
+                                        "Rp. ${formatter.formatNumber(0)}",
+                                        style: GoogleFonts.montserrat(
+                                            color: Colors.white, fontSize: 14
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Text Transaction
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          "Transaction",
+                          style: GoogleFonts.montserrat(
+                              fontSize: 16, fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ),
+                      const Center(
+                        child: Text("Data not found"),
+                      )
+                    ],
+                  );
+
+                }
+              }
+            }
+        ),
       ),
     );
   }
